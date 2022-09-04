@@ -12,6 +12,8 @@ class Board():
     supports = []
     loads = []
     load_value = -100
+    target_columns = []
+    pre_target_columns = []
     bars = []
 
     def __init__(self, l = 18.288, h =4.572, nx = 4, ny = 4, optimize = False):   
@@ -34,16 +36,22 @@ class Board():
             Board.boundary_conditions_generated = True
             # create list of cross sections for optimization
             Board.crosec_list = Board._create_crosecs_for_optimization()
-            ## Set up the supports
-            #Board.supports = [(0,int(self.ny/2)),(int(self.nx),int(self.ny/2))] # index of supports
-            ## Set up the loads
-            #Board.loads = [(int(self.nx/2),int(self.ny/2))] # index of the noads where loads are applied
             # Set up the supports
-            Board.supports = [(0,0),(int(self.nx),0)] # index of supports
+            Board.supports = [(0,0),(int(self.nx),0)] # index of supports            
             # Set up the loads
             Board.loads = [(int(self.nx/2),0)] # index of the noads where loads are applied
-
-        #Board.bars = []
+            # check loads and supports
+            assert not any(s[1] for s in Board.supports), "all supports should have z=0"
+            assert not any(l[1] for l in Board.loads), "all loads should have z=0"
+            # Add target columns -> to set the valid nodes in order to avoid instabilities
+            for s in Board.supports:
+                Board.target_columns.append(s[0])
+                if s[0] >0:
+                    Board.pre_target_columns.append(s[0]-1)
+            for l in Board.loads:
+                Board.target_columns.append(l[0])
+                if s[0] >0:
+                    Board.pre_target_columns.append(l[0]-1)
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index): 
@@ -60,6 +68,7 @@ class Board():
     def get_steel_mass(nx, ny, l, h, nodes, optimize):
         steel_mass = 0.0 #kg       
         truss, loads = Board.generate_truss(nx, ny, l, h, nodes)
+        #truss.plot()
         # calculate structure
         truss.directStiffness(np.array(loads))
         for i in range(len(truss.members)):
@@ -136,23 +145,22 @@ class Board():
             current_column = last_column+1
         return current_column, last_column, node_location
 
-    def get_targets(current_column, max_spacing, nx):
+    def get_targets(current_column, max_spacing, nx, next_node_top_or_bottom):
         target_columns = []
-        all_columns_found=False
         j = current_column
         target_row = -1
         if j>nx:
             return target_row, target_columns        
         while True:
             target_columns.append(j)
-            for load in Board.loads:
-                if load[0] == j:
-                    target_row = load[1]
+            if j in Board.target_columns: # columns with loads or supports
+                if next_node_top_or_bottom: # if next node ist to be on the top chord, a column with loads or supports can not be considered
+                    target_columns.pop()
                     return target_row, target_columns
-            for support in Board.supports:
-                if support[0] == j:
-                    target_row = support[1]
-                    return target_row, target_columns
+                target_row = 0
+                return target_row, target_columns       
+            if j in Board.pre_target_columns and not next_node_top_or_bottom: # if next node ist to be on the bottom chord, a column previous to one with loads or supports can not be considered
+                target_columns.pop() # but we don't return yet, because we need to consider target column that comes next
             if j == nx or j - current_column +1 == max_spacing:
                 return target_row, target_columns
             j = j+1
@@ -162,12 +170,21 @@ class Board():
         # previous node above -> 1; previous node below ->-1
         if last_column>0:
             j = last_column
-            while True: 
+            while True:
                 j = j-1
-                if node_location[j]:
+                if node_location[j] >= 0:
                     if node_location[j]>node_location[last_column]:
                         return 1
                     elif node_location[j]<node_location[last_column]:
                         return -1
+                    else:
+                        return 0
         else:
             return 0
+
+    # will return 0 if the last populated node belongs to the bottom chord and 1 if it belongs to the top chord of the truss
+    # basically the first node is a support in the bottom chord and then each new nodes is located in the opposite chord
+    def next_node_top_or_bottom(nodes):
+        number_of_nodes = np.sum(np.array(nodes) >= 0)
+        location = number_of_nodes % 2 
+        return location # 0 -> next node bottom; 1 -> next node top

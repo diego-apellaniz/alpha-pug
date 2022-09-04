@@ -26,15 +26,15 @@ class TrussNNet(nn.Module):
         self.bn3 = nn.BatchNorm2d(args.num_channels)
         self.bn4 = nn.BatchNorm2d(args.num_channels)
 
-        self.fc1 = nn.Linear(args.num_channels*(self.board_x-4)*(self.board_y-4), 1024)
-        self.fc_bn1 = nn.BatchNorm1d(1024)
+        self.fc1 = nn.Linear(args.num_channels*(self.board_x-4)*(self.board_y-4), 1024) #1024
+        self.fc_bn1 = nn.BatchNorm1d(1024) #1024
 
-        self.fc2 = nn.Linear(1024, 512)
-        self.fc_bn2 = nn.BatchNorm1d(512)
+        self.fc2 = nn.Linear(1024, 512) #1024,512
+        self.fc_bn2 = nn.BatchNorm1d(512) #512
 
-        self.fc3 = nn.Linear(512, self.action_size)
+        self.fc3 = nn.Linear(512, self.action_size) #512
 
-        self.fc4 = nn.Linear(512, 1)
+        self.fc4 = nn.Linear(512, 1) #512
 
     def forward(self, s):
         #                                                           s: batch_size x board_x x board_y

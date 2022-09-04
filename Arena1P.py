@@ -1,16 +1,17 @@
 import logging
+import math
 
 from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-
-class Arena():
+### this class is an arena to compare two agents for single-player MDP environments (unlike othello, tic-tac-toe and all other games of the original repository)
+class Arena1P():
     """
     An Arena class where any 2 agents can be pit against each other.
     """
 
-    def __init__(self, player1, player2, game, display=None):
+    def __init__(self, player1, player2, game, mcts1, mcts2, display=None):
         """
         Input:
             player 1,2: two functions that takes board as input, return action
@@ -26,9 +27,10 @@ class Arena():
         self.player2 = player2
         self.game = game
         self.display = display
-        
+        self.mcts1 = mcts1 # daq
+        self.mcts2 = mcts2 # daq
 
-    def playGame(self, verbose=False):
+    def playGame(self, player, mcts, verbose=False):
         """
         Executes one episode of a game.
 
@@ -38,7 +40,7 @@ class Arena():
             or
                 draw result returned from the game that is neither 1, -1, nor 0.
         """
-        players = [self.player2, None, self.player1]
+
         curPlayer = 1
         board = self.game.getInitBoard()
         it = 0
@@ -47,8 +49,11 @@ class Arena():
             if verbose:
                 assert self.display
                 print("Turn ", str(it), "Player ", str(curPlayer))
-                self.display(board)
-            action = players[curPlayer + 1](self.game.getCanonicalForm(board, curPlayer))
+                #probs = mcts.getActionProb(board, temp=1)
+                #print(board)
+                #print(probs)
+                #self.display(board)
+            action = player(self.game.getCanonicalForm(board, curPlayer))
             valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer), 1)
 
             if valids[action] == 0:
@@ -59,7 +64,8 @@ class Arena():
         if verbose:
             assert self.display
             print("Game over: Turn ", str(it), "Result ", str(self.game.getGameEnded(board, 1)))
-            self.display(board)
+            print(board)
+            #self.display(board)
         return curPlayer * self.game.getGameEnded(board, curPlayer)
 
     def playGames(self, num, verbose=False):
@@ -74,27 +80,22 @@ class Arena():
         """
 
         num = int(num / 2)
-        oneWon = 0
-        twoWon = 0
+        max_one = -math.inf
+        max_two = -math.inf
         draws = 0
         for _ in tqdm(range(num), desc="Arena.playGames (1)"):
-            gameResult = self.playGame(verbose=verbose)
-            if gameResult == 1:
-                oneWon += 1
-            elif gameResult == -1:
-                twoWon += 1
-            else:
-                draws += 1
+            gameResult = self.playGame(self.player1, self.mcts1, verbose=verbose)
+            if gameResult > max_one:
+                max_one = gameResult
 
-        self.player1, self.player2 = self.player2, self.player1
 
         for _ in tqdm(range(num), desc="Arena.playGames (2)"):
-            gameResult = self.playGame(verbose=verbose)
-            if gameResult == -1:
-                oneWon += 1
-            elif gameResult == 1:
-                twoWon += 1
-            else:
-                draws += 1
+            gameResult = self.playGame(self.player2, self.mcts2, verbose=verbose)
+            if gameResult > max_two:
+                max_two = gameResult
+
+        oneWon = max_one>max_two
+        twoWon = max_one<max_two
+        draws = max_one==max_two
 
         return oneWon, twoWon, draws

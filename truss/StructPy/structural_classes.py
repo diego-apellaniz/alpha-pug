@@ -129,40 +129,6 @@ class Structure(object):
 			self.defaultcross = cross # List of cross sections
 			self.defaultmaterial = material
 
-	#@classmethod
-	#def from_yaml_file(cls, filePath):
-
-	#	## Read in yaml file as a dictionary
-	#	with open(filePath, 'r') as stream:
-	#		try:
-	#			data = yaml.safe_load(stream)
-	#		except yaml.YAMLError as exc:
-	#			print(exc)
-
-	#	## Initialize structure
-	#	xsection = xs.generalSection(**data['XSection'])
-	#	material = ma.Custom(**data['Material'])
-	#	s1 = cls(cross=xsection, material=material)
-
-	#	## Add nodes
-	#	nodeMap = {} # map nodes to indicies
-	#	for i, node in enumerate(data['Nodes']):
-	#		for key, value in node.items():
-	#			try:
-	#				s1.addNode(value['x'], value['y'], fixity=value['fixity'])
-	#			except KeyError:
-	#				s1.addNode(value['x'], value['y'])
-
-	#			nodeMap.update({key: i})
-
-	#	## Add members
-	#	for member in data['Members']:
-	#		for key, value in member.items():
-	#			SN, EN = key.split(',')
-	#			s1.addMember(nodeMap[SN], nodeMap[EN], expectedaxial=value['axial'])
-
-	#	return s1
-
 	def addNode(self, x, y, cost=0, fixity='free'):
 		"""
 		Add node to the structure
@@ -227,7 +193,7 @@ class Structure(object):
 		"""Check stability"""
 		eigs, vecs = np.linalg.eig(self.reducedK)
 		if np.isclose(eigs, 0).any() == True:
-			logging.warning(eigs)
+			#logging.warning(eigs)
 			raise ValueError('Structure is unstable.')
 	
 	def solve(self, loading):

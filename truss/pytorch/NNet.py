@@ -17,12 +17,11 @@ from .TrussNNet import TrussNNet as onnet
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 10,
-    'batch_size': 64,
+    'epochs': 2, #10
+    'batch_size': 32, # 64
     'cuda': torch.cuda.is_available(),
-    'num_channels': 512,
+    'num_channels': 32, #512
 })
-
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):

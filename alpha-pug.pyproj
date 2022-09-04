@@ -26,8 +26,9 @@
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arena1P.py" />
     <Compile Include="Arena.py" />
-    <Compile Include="Coach.py" />
+    <Compile Include="Coach1P.py" />
     <Compile Include="connect4\Connect4Game.py" />
     <Compile Include="connect4\Connect4Logic.py" />
     <Compile Include="connect4\Connect4Players.py" />
@@ -56,7 +57,7 @@
     <Compile Include="gobang\keras\NNet.py" />
     <Compile Include="gobang\__init__.py" />
     <Compile Include="main.py" />
-    <Compile Include="MCTS.py" />
+    <Compile Include="MCTS1P.py" />
     <Compile Include="NeuralNet.py" />
     <Compile Include="othello\keras\NNet.py" />
     <Compile Include="othello\keras\OthelloNNet.py" />
@@ -113,6 +114,9 @@
     <Compile Include="tictactoe_3d\TicTacToeGame.py" />
     <Compile Include="tictactoe_3d\TicTacToeLogic.py" />
     <Compile Include="tictactoe_3d\TicTacToePlayers.py" />
+    <Compile Include="truss\keras\NNet.py" />
+    <Compile Include="truss\keras\TrussNNet.py" />
+    <Compile Include="truss\keras\__init__.py" />
     <Compile Include="truss\pytorch\NNet.py" />
     <Compile Include="truss\pytorch\TrussNNet.py" />
     <Compile Include="truss\pytorch\__init__.py" />
@@ -151,6 +155,7 @@
     <Folder Include="tictactoe\keras" />
     <Folder Include="tictactoe_3d" />
     <Folder Include="tictactoe_3d\keras" />
+    <Folder Include="truss\keras\" />
     <Folder Include="truss\pytorch\" />
     <Folder Include="truss\StructPy\" />
   </ItemGroup>
