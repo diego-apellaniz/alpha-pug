@@ -85,6 +85,11 @@
     <Compile Include="santorini\SantoriniGame.py" />
     <Compile Include="santorini\SantoriniLogic.py" />
     <Compile Include="santorini\SantoriniPlayers.py" />
+    <Compile Include="slidingblocks\keras\NNet.py" />
+    <Compile Include="slidingblocks\keras\TrussNNet.py" />
+    <Compile Include="slidingblocks\keras\__init__.py" />
+    <Compile Include="slidingblocks\BlocksGame.py" />
+    <Compile Include="slidingblocks\BlocksLogic.py" />
     <Compile Include="tafl\Digits.py" />
     <Compile Include="tafl\GameVariants.py" />
     <Compile Include="tafl\keras\NNet.py" />
@@ -138,6 +143,8 @@
     <Folder Include="dotsandboxes\keras" />
     <Folder Include="gobang" />
     <Folder Include="gobang\keras" />
+    <Folder Include="slidingblocks\" />
+    <Folder Include="slidingblocks\keras\" />
     <Folder Include="truss\" />
     <Folder Include="othello" />
     <Folder Include="othello\keras" />
